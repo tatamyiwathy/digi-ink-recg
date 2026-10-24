@@ -51,63 +51,47 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun DrawingCanvas(name: String, modifier: Modifier = Modifier) {
-        logD("DrawingCanvas")
 
-        val points = remember { mutableStateListOf<Offset>() }
         val paths = remember { mutableStateListOf<Path>() }
         val inkStrokes = remember { mutableStateListOf<List<PointerData>>() }
-        var currentStroke = remember { mutableListOf<PointerData>() }
+        var currentStroke = remember { mutableStateListOf<PointerData>() }
 
         Canvas(
             modifier = modifier
                 .fillMaxSize()
                 .pointerInput(Unit) {
-                    /*detectTapGestures {
-                        logD("Tap {at $it")
-                    }*/
-
-                    /*detectDragGestures { change, dragAmount ->
-                        logD("Drag {at $dragAmount")
-                        change.consume()
-                        // 現在の指の位置を追従させる
-                        points.add(change.position)
-                    }*/
                     detectDragGestures(
-                        onDragStart = {
-                            logD("DragStart")
-                            points.clear()
+                        onDragStart = { offset ->
+                            currentStroke.clear()
+                            currentStroke.add(PointerData(offset))
                         },
                         onDragEnd = {
-                            logD("DragEnd")
+                            inkStrokes.add(currentStroke.toList())
 
                             paths.add(
                                 Path().apply {
-                                    moveTo(points[0].x, points[0].y)
+                                    moveTo(currentStroke[0].offset.x, currentStroke[0].offset.y)
 
-                                    for (i in 1 until points.size) {
-                                        lineTo(points[i].x, points[i].y)
+                                    for (i in 1 until currentStroke.size) {
+                                        lineTo(currentStroke[i].offset.x, currentStroke[i].offset.y)
                                     }
-                                }
-                            )
+                                })
                         },
                         onDragCancel = {
-                            logD("DragCancel")
                         },
-                        onDrag = { change, dragAmount ->
-                            logD("Drag {at $dragAmount")
-                            change.consume()
-                            // 現在の指の位置を追従させる
-                            points.add(change.position)
+                        onDrag = { change, _ ->
+                            val offset = change.position
+                            currentStroke.add(PointerData(offset))
                         }
                     )
                 }
         ) {
-            if (points.size > 1) {
+            if (currentStroke.size > 1) {
                 val path = Path().apply {
-                    moveTo(points[0].x, points[0].y)
+                    moveTo(currentStroke[0].offset.x, currentStroke[0].offset.y)
 
-                    for (i in 1 until points.size) {
-                        lineTo(points[i].x, points[i].y)
+                    for (i in 1 until currentStroke.size) {
+                        lineTo(currentStroke[i].offset.x, currentStroke[i].offset.y)
                     }
                 }
 
@@ -117,13 +101,9 @@ class MainActivity : ComponentActivity() {
                 )
             }
 
-            for (path in paths) {
-                drawPath(
-                    path = path, color = Color.Black,
-                    style = Stroke(5f, cap = StrokeCap.Round)
-                )
+            paths.forEach { path ->
+                drawPath(path, color = Color.Black, style = Stroke(5f, cap = StrokeCap.Round))
             }
-
         }
 
         Text(
