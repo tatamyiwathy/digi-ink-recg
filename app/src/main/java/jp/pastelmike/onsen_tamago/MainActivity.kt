@@ -30,6 +30,10 @@ fun logD(message: String) {
     Log.d("OnsenTamago", message)
 }
 
+data class PointerData(
+    val offset: Offset,
+    val timestamp: Long = System.currentTimeMillis()
+)
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,7 +54,9 @@ class MainActivity : ComponentActivity() {
         logD("DrawingCanvas")
 
         val points = remember { mutableStateListOf<Offset>() }
-        val drawedPath = remember { mutableStateListOf<Path>() }
+        val paths = remember { mutableStateListOf<Path>() }
+        val inkStrokes = remember { mutableStateListOf<List<PointerData>>() }
+        var currentStroke = remember { mutableListOf<PointerData>() }
 
         Canvas(
             modifier = modifier
@@ -66,7 +72,7 @@ class MainActivity : ComponentActivity() {
                         // 現在の指の位置を追従させる
                         points.add(change.position)
                     }*/
-                    detectDragGestures (
+                    detectDragGestures(
                         onDragStart = {
                             logD("DragStart")
                             points.clear()
@@ -74,7 +80,7 @@ class MainActivity : ComponentActivity() {
                         onDragEnd = {
                             logD("DragEnd")
 
-                            drawedPath.add(
+                            paths.add(
                                 Path().apply {
                                     moveTo(points[0].x, points[0].y)
 
@@ -93,7 +99,8 @@ class MainActivity : ComponentActivity() {
                             // 現在の指の位置を追従させる
                             points.add(change.position)
                         }
-                    )                }
+                    )
+                }
         ) {
             if (points.size > 1) {
                 val path = Path().apply {
@@ -104,13 +111,17 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                drawPath(path = path, color = Color.Black,
-                    style = Stroke(5f, cap = StrokeCap.Round))
+                drawPath(
+                    path = path, color = Color.Black,
+                    style = Stroke(5f, cap = StrokeCap.Round)
+                )
             }
 
-            for (path in drawedPath) {
-                drawPath(path = path, color = Color.Black,
-                    style = Stroke(5f, cap = StrokeCap.Round))
+            for (path in paths) {
+                drawPath(
+                    path = path, color = Color.Black,
+                    style = Stroke(5f, cap = StrokeCap.Round)
+                )
             }
 
         }
