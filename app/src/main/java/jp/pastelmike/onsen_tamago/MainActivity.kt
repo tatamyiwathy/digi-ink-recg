@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,7 +60,7 @@ class MainActivity : ComponentActivity() {
         val paths = remember { mutableStateListOf<Path>() }
         val inkStrokes = remember { mutableStateListOf<List<PointerData>>() }
         var currentStroke = remember { mutableStateListOf<PointerData>() }
-        var debounceTrigger by remember { mutableStateOf(0) }
+        var debounceTrigger by remember { mutableIntStateOf(0) }
         var resultText by remember { mutableStateOf("ここに結果が表示されます") }
         val textMeasurer = rememberTextMeasurer()
         val style = TextStyle(
@@ -72,7 +73,7 @@ class MainActivity : ComponentActivity() {
             if (debounceTrigger > 0) {
                 delay(1000L)
                 recognizeHandwriting(inkStrokes, onSuccess = { text ->
-                    resultText = if (!text.isNullOrEmpty()) {
+                    resultText = if (text.isNotEmpty()) {
                         text
                     } else {
                         "認識できませんでした。"
