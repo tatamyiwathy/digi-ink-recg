@@ -24,15 +24,13 @@ fun recognizeHandwriting(
         logD("inkStrokes: ${it.offset}, ${it.timestamp}")
     }
 
-    // 1. Ink.Builder を作成
     val inkBuilder = Ink.builder()
 
-    // 2. 記録したストロークデータを Ink に変換
     for (strokePoints in inkStrokes) {
         val strokeBuilder = Ink.Stroke.builder()
-        for (point in strokePoints) {
+        strokePoints.forEach {
             strokeBuilder.addPoint(
-                Ink.Point.create(point.offset.x, point.offset.y, point.timestamp)
+                Ink.Point.create(it.offset.x, it.offset.y, it.timestamp)
             )
         }
         inkBuilder.addStroke(strokeBuilder.build())
