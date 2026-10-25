@@ -34,7 +34,6 @@ import androidx.compose.ui.unit.sp
 import jp.pastelmike.onsen_tamago.ui.theme.OnsenTamagoTheme
 import kotlinx.coroutines.delay
 
-
 // Log.d("OnsenTamago", message)
 fun logD(message: String) {
     Log.d("OnsenTamago", message)
