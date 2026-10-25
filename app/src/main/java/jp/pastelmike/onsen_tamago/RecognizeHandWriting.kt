@@ -19,10 +19,6 @@ fun recognizeHandwriting(
     onSuccess: (String) -> Unit,
     onFailure: (Exception) -> Unit
 ) {
-    logD("inkStrokes: ${inkStrokes.size}")
-    inkStrokes[0].forEach {
-        logD("inkStrokes: ${it.offset}, ${it.timestamp}")
-    }
 
     val inkBuilder = Ink.builder()
 
@@ -53,11 +49,9 @@ fun recognizeHandwriting(
             .addOnSuccessListener { result ->
                 // 最も信頼度の高い候補テキストを取得
                 val candidateText = result.candidates.firstOrNull()?.text ?: ""
-                logD("result: $candidateText")
                 onSuccess(candidateText)
             }
             .addOnFailureListener { e ->
-                logD("failure: $e")
                 onFailure(e)
             }
     }
@@ -67,7 +61,6 @@ fun recognizeHandwriting(
             recognize()
         }
         .addOnFailureListener { e ->
-            logD("failure: $e")
             onFailure(e)
         }
 

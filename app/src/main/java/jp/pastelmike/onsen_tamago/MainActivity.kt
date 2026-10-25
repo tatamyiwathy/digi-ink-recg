@@ -71,22 +71,23 @@ class MainActivity : ComponentActivity() {
         LaunchedEffect(debounceTrigger) {
             if (debounceTrigger > 0) {
                 delay(1000L)
-                logD("recognizeHandwriting")
                 recognizeHandwriting(inkStrokes, onSuccess = { text ->
                     resultText = if (!text.isNullOrEmpty()) {
                         text
                     } else {
                         "認識できませんでした。"
                     }
+                    logD("recognizeHandwrite result: $resultText")
+
+
+                    paths.clear()
+                    currentStroke.clear()
+                    inkStrokes.clear()
 
 
                 }, onFailure = { exception ->
                     resultText = "エラーが発生しました: ${exception.localizedMessage}"
                 })
-                paths.clear()
-                currentStroke.clear()
-                inkStrokes.clear()
-                logD("recognizeHandwrite result: $resultText")
             }
         }
 
