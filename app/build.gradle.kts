@@ -54,4 +54,7 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
 // ML Kit Digital Ink Recognition の最新ライブラリを追加
     implementation("com.google.mlkit:digital-ink-recognition:18.1.0")
+
+    implementation("androidx.compose.material:material-icons-core:1.7.8") // バージョンはプロジェクトに合わせて調整
+
 }
