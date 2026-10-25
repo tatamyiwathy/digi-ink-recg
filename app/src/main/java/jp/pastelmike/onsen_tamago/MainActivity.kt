@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -65,8 +66,9 @@ class MainActivity : ComponentActivity() {
                     .fillMaxSize()
                     .padding(innerPadding)
             ){
-                Text(
-                    text = inputText,
+                OutlinedTextField(
+                    value = inputText,
+                    onValueChange = { inputText = it },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
@@ -108,7 +110,6 @@ class MainActivity : ComponentActivity() {
             fontWeight = FontWeight.Bold
         )
 
-        logD("nande")
         LaunchedEffect(debounceTrigger) {
             if (debounceTrigger > 0) {
                 delay(1000L)
@@ -174,7 +175,7 @@ class MainActivity : ComponentActivity() {
 
             drawText(
                 textLayoutResult,
-                topLeft = Offset(100f, 100f)
+                topLeft = Offset(100f, size.height - textLayoutResult.size.height )
             )
 
             if (currentStroke.size > 1) {
