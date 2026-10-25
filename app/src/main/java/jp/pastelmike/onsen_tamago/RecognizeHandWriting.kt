@@ -1,6 +1,8 @@
 package jp.pastelmike.onsen_tamago
 
 import androidx.compose.ui.geometry.Offset
+import com.google.mlkit.common.model.DownloadConditions
+import com.google.mlkit.common.model.RemoteModelManager
 import com.google.mlkit.vision.digitalink.DigitalInkRecognition
 import com.google.mlkit.vision.digitalink.DigitalInkRecognitionModel
 import com.google.mlkit.vision.digitalink.DigitalInkRecognitionModelIdentifier
@@ -37,23 +39,39 @@ fun recognizeHandwriting(
     }
 
     val inkObject = inkBuilder.build()
-    val modelIdentifier = DigitalInkRecognitionModelIdentifier.EN
+    val modelIdentifier = DigitalInkRecognitionModelIdentifier.JA
     val model = DigitalInkRecognitionModel.builder(modelIdentifier).build()
+    val remoteModelManager = RemoteModelManager.getInstance()
 
-    // 3. デジタルインク認識を実行（日本語モデル `ja` の例）
-    val options = DigitalInkRecognizerOptions.builder(
-        model
-    ).build()
+    // 認識
+    fun recognize() {
+        val options = DigitalInkRecognizerOptions.builder(
+            model
+        ).build()
 
-    val recognizer = DigitalInkRecognition.getClient(options)
+        val recognizer = DigitalInkRecognition.getClient(options)
 
-    recognizer.recognize(inkObject)
-        .addOnSuccessListener { result ->
-            // 最も信頼度の高い候補テキストを取得
-            val candidateText = result.candidates.firstOrNull()?.text ?: ""
-            onSuccess(candidateText)
+        recognizer.recognize(inkObject)
+            .addOnSuccessListener { result ->
+                // 最も信頼度の高い候補テキストを取得
+                val candidateText = result.candidates.firstOrNull()?.text ?: ""
+                logD("result: $candidateText")
+                onSuccess(candidateText)
+            }
+            .addOnFailureListener { e ->
+                logD("failure: $e")
+                onFailure(e)
+            }
+    }
+
+    remoteModelManager.download(model, DownloadConditions.Builder().build())
+        .addOnSuccessListener {
+            recognize()
         }
         .addOnFailureListener { e ->
+            logD("failure: $e")
             onFailure(e)
         }
+
+
 }

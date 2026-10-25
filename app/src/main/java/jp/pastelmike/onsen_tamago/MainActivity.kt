@@ -73,18 +73,20 @@ class MainActivity : ComponentActivity() {
             if (debounceTrigger > 0) {
                 delay(1000L)
                 logD("recognizeHandwriting")
-                //doSomething
-                /*
-                                recognizeHandwriting(inkStrokes, onSuccess = { text ->
-                                    resultText = if (!text.isNullOrEmpty()){ text } else {"認識できませんでした。"}
+                recognizeHandwriting(inkStrokes, onSuccess = { text ->
+                    resultText = if (!text.isNullOrEmpty()) {
+                        text
+                    } else {
+                        "認識できませんでした。"
+                    }
 
 
-                                }, onFailure = { exception ->
-                                    resultText = "エラーが発生しました: ${exception.localizedMessage}"
-                                })
-                */
+                }, onFailure = { exception ->
+                    resultText = "エラーが発生しました: ${exception.localizedMessage}"
+                })
                 paths.clear()
                 currentStroke.clear()
+                inkStrokes.clear()
                 logD("recognizeHandwrite result: $resultText")
             }
         }
@@ -97,6 +99,7 @@ class MainActivity : ComponentActivity() {
                         onDragStart = { offset ->
                             currentStroke.clear()
                             currentStroke.add(PointerData(offset))
+                            debounceTrigger = 0
 
                         },
                         onDragEnd = {
@@ -118,6 +121,7 @@ class MainActivity : ComponentActivity() {
                         onDrag = { change, _ ->
                             val offset = change.position
                             currentStroke.add(PointerData(offset))
+                            debounceTrigger = 0
                         }
                     )
                 }
