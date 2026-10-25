@@ -7,7 +7,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -31,6 +33,7 @@ import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import jp.pastelmike.onsen_tamago.ui.theme.OnsenTamagoTheme
 import kotlinx.coroutines.delay
@@ -46,16 +49,52 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             OnsenTamagoTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { padding ->
-                    DrawingCanvas("OnsenTamago", modifier = Modifier.padding(padding))
-                }
+                OnsenTamagoScreen()
             }
         }
     }
 
+    @Composable
+    fun OnsenTamagoScreen()
+    {
+        var inputText by remember { mutableStateOf("") }
+
+        Scaffold(){innerPadding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ){
+                Text(
+                    text = inputText,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                )
+
+                DrawingCanvas(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    onRecognized = { text ->
+                        inputText += text
+                    }
+
+                )
+
+            }
+
+        }
+
+    }
+
+
+
 
     @Composable
-    fun DrawingCanvas(name: String, modifier: Modifier = Modifier) {
+    fun DrawingCanvas(modifier: Modifier = Modifier,
+                      onRecognized: (String) -> Unit)
+    {
 
         val paths = remember { mutableStateListOf<Path>() }
         val inkStrokes = remember { mutableStateListOf<List<PointerData>>() }
@@ -69,12 +108,13 @@ class MainActivity : ComponentActivity() {
             fontWeight = FontWeight.Bold
         )
 
+        logD("nande")
         LaunchedEffect(debounceTrigger) {
             if (debounceTrigger > 0) {
                 delay(1000L)
                 recognizeHandwriting(inkStrokes, onSuccess = { text ->
-                    resultText = if (text.isNotEmpty()) {
-                        text
+                    if (text.isNotEmpty()) {
+                        onRecognized(text)
                     } else {
                         "認識できませんでした。"
                     }
@@ -101,7 +141,7 @@ class MainActivity : ComponentActivity() {
                             currentStroke.clear()
                             currentStroke.add(PointerData(offset))
                             debounceTrigger = 0
-
+                            logD("drag start")
                         },
                         onDragEnd = {
                             inkStrokes.add(currentStroke.toList())
@@ -157,10 +197,6 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        Text(
-            text = "Hello $name!",
-            modifier = modifier
-        )
     }
 
     @Composable
