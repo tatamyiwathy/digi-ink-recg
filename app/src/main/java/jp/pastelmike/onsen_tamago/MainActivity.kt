@@ -181,7 +181,6 @@ class MainActivity : ComponentActivity() {
                             currentStroke.clear()
                             currentStroke.add(PointerData(offset))
                             debounceTrigger = 0
-                            logD("drag start")
                         },
                         onDragEnd = {
                             inkStrokes.add(currentStroke.toList())
