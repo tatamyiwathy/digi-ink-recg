@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -48,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import jp.pastelmike.onsen_tamago.ui.theme.OnsenTamagoTheme
 import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.seconds
 
 // Log.d("OnsenTamago", message)
 fun logD(message: String) {
@@ -66,24 +66,25 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun OnsenTamagoScreen()
-    {
+    fun OnsenTamagoScreen() {
         var inputText by remember { mutableStateOf("") }
 
-        Scaffold(){innerPadding ->
+        Scaffold { innerPadding ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
-            ){
+            ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
-                ){
+                ) {
                     OutlinedTextField(
                         value = inputText,
                         onValueChange = { inputText = it },
-                        modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 8.dp),
                         label = { Text("入力欄") }
 
                     )
@@ -130,18 +131,16 @@ class MainActivity : ComponentActivity() {
     }
 
 
-
-
     @Composable
-    fun DrawingCanvas(modifier: Modifier = Modifier,
-                      onRecognized: (String) -> Unit)
-    {
+    fun DrawingCanvas(
+        modifier: Modifier = Modifier,
+        onRecognized: (String) -> Unit
+    ) {
 
         val paths = remember { mutableStateListOf<Path>() }
         val inkStrokes = remember { mutableStateListOf<List<PointerData>>() }
-        var currentStroke = remember { mutableStateListOf<PointerData>() }
+        val currentStroke = remember { mutableStateListOf<PointerData>() }
         var debounceTrigger by remember { mutableIntStateOf(0) }
-        var resultText by remember { mutableStateOf("ここに結果が表示されます") }
         val textMeasurer = rememberTextMeasurer()
         val style = TextStyle(
             color = Color.Black,
@@ -151,14 +150,13 @@ class MainActivity : ComponentActivity() {
 
         LaunchedEffect(debounceTrigger) {
             if (debounceTrigger > 0) {
-                delay(1000L)
+                delay(1.seconds)
                 recognizeHandwriting(inkStrokes, onSuccess = { text ->
                     if (text.isNotEmpty()) {
                         onRecognized(text)
                     } else {
-                        "認識できませんでした。"
+                        logD("recognizeHandwrite: empty text")
                     }
-                    logD("recognizeHandwrite result: $resultText")
 
 
                     paths.clear()
@@ -167,7 +165,7 @@ class MainActivity : ComponentActivity() {
 
 
                 }, onFailure = { exception ->
-                    resultText = "エラーが発生しました: ${exception.localizedMessage}"
+                    logD("recognizeHandwrite error: ${exception.localizedMessage}")
                 })
             }
         }
@@ -213,7 +211,7 @@ class MainActivity : ComponentActivity() {
 
             drawText(
                 textLayoutResult,
-                topLeft = Offset(100f, size.height - textLayoutResult.size.height )
+                topLeft = Offset(100f, size.height - textLayoutResult.size.height)
             )
 
             if (currentStroke.size > 1) {
@@ -236,14 +234,6 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-    }
-
-    @Composable
-    fun Greeting(name: String, modifier: Modifier = Modifier) {
-        Text(
-            text = "Hello $name!",
-            modifier = modifier
-        )
     }
 
     @Preview(showBackground = true)
