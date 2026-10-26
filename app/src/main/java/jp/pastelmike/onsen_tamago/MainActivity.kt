@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
@@ -82,20 +83,21 @@ class MainActivity : ComponentActivity() {
                     OutlinedTextField(
                         value = inputText,
                         onValueChange = { inputText = it },
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
                         label = { Text("入力欄") }
+
                     )
 
                     Spacer(modifier = Modifier.width(8.dp))
 
                     IconButton(
                         onClick = {
-                            inputText = ""
+                            inputText = inputText.dropLast(1)
                         }
 
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Delete,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Clear"
                         )
                     }
@@ -249,7 +251,7 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun GreetingPreview() {
         OnsenTamagoTheme {
-            Greeting("Android")
+            OnsenTamagoScreen()
         }
     }
 }
