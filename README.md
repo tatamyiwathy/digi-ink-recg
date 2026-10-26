@@ -40,3 +40,7 @@
 
 - [Google ML Kit Digital Ink Recognition 公式ドキュメント](https://developers.google.com/ml-kit/vision/digital-ink-recognition)
 - [Jetpack Compose ドキュメント](https://developer.android.com/jetpack/compose)
+
+- ## License
+
+This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
